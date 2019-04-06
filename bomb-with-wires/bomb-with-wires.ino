@@ -9,7 +9,7 @@ int wire4 = 3;
 const byte ledPin = 13;    //using the built in LED
 
 /*  Application variables:  */
-int maxSec = 1000; // Time to defuse the bomb
+int maxSec = 60*40; // Time to defuse the bomb
 bool EXPLODED = false;
 bool DEFUSED = false;
 unsigned long period = 10000;  //Amount of milliseconds between the buzzers
