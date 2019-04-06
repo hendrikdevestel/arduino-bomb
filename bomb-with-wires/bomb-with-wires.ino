@@ -1,42 +1,37 @@
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
-#include <Keypad.h>
 
 int buzzerPin = 10;
+int wire1 = 0;
+int wire2 = 1;
+int wire3 = 2;
+int wire4 = 3;
 const byte ledPin = 13;    //using the built in LED
-/* KEYPAD: */
-const byte numRows= 4;
-const byte numCols= 4;
-char keymap[numRows][numCols]= { {'1', '2', '3', 'A'},{'4', '5', '6', 'B'},{'7', '8', '9', 'C'},{'*', '0', '#', 'D'} };
-byte rowPins[numRows] = {9,8,7,6}; //Rows 0 to 3
-byte colPins[numCols]= {5,4,3,2}; //Columns 0 to 3
 
 /*  Application variables:  */
-String code = "2305"; //The code to defuse the bomb
 int maxSec = 1000; // Time to defuse the bomb
-String inseredCode = "";
 bool EXPLODED = false;
 bool DEFUSED = false;
 unsigned long period = 10000;  //Amount of milliseconds between the buzzers
-bool canEnterCode = false; // Whether the code can be entered (after pressing *)
-int keyIndex = 12; //Where the code will be insered on the display
 
 /*  TIMERS  */
 unsigned long startMillis;  //global start time of the program
 unsigned long startMillisForBuzzer;  //Start timer for buzzer
-unsigned long startMillisForBlinking;  //Start timer for buzzer
 bool showResult= true;
 int totalSec = 0; // Ellapsed time since start
 unsigned long currentMillis;
 
 LiquidCrystal_I2C lcd(0x27,20,4);  // set the LCD address to 0x27 for a 16 chars and 2 line display
-Keypad myKeypad= Keypad(makeKeymap(keymap), rowPins, colPins, numRows, numCols);
 
 void setup() {
   lcd.init();
   lcd.backlight();
   startMillisForBuzzer = millis();
   startMillis = millis();
+  pinMode(wire1,INPUT_PULLUP);
+  pinMode(wire2,INPUT_PULLUP);
+  pinMode(wire3,INPUT_PULLUP);
+  pinMode(wire4,INPUT_PULLUP);
 }
 
 void loop() {
@@ -47,35 +42,7 @@ void loop() {
     return;
   }
   timer(); //Continue timer
-  char keypressed = myKeypad.getKey();
-  if (keypressed != NO_KEY)
-  {
-    if(canEnterCode){ // If the code can be entered
-      inseredCode = String(inseredCode + keypressed);
-      if(inseredCode == code){
-        defuse();
-      }
-      else{
-        if(inseredCode.length() <= 3){
-          tone(buzzerPin, 500, 100);
-          lcd.setCursor(keyIndex,1);
-          lcd.print(keypressed);
-          keyIndex++;
-        }
-        else{
-          explode();
-        }
-      }
-    }
-    else{
-      if(keypressed == '*'){
-        tone(buzzerPin, 500, 100);
-        inseredCode = "";
-        writeLine(1,0, "Enter code: ____");
-        canEnterCode = true;
-      }
-    }
-  }
+  checkWires();
 }
 
 void checkBuzzer(int duration){
@@ -154,18 +121,18 @@ void clearLine(int line){
   lcd.print("                ");
 }
 
-void checkBlinking(){
-  int blinkPeriod = 1000;
-  currentMillis = millis();
-  if(currentMillis - startMillisForBlinking >= blinkPeriod){
-    if(showResult){
-      writeLine(1,1, "BOMB EXPLODED");
-      showResult = false;
+void checkWires(){
+  int pin1 = digitalRead(wire1);
+  int pin2 = digitalRead(wire2);
+  int pin3 = digitalRead(wire3);
+  int pin4 = digitalRead(wire4);
+
+  if(pin1 == HIGH || pin2 == HIGH || pin3 == HIGH){
+    explode();
+  }
+  else{
+    if(pin4 == HIGH){
+      defuse();
     }
-    else{
-      clearLine(1);
-      showResult = true;
-    }
-    startMillisForBlinking = currentMillis;
   }
 }
