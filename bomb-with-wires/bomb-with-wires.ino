@@ -9,7 +9,7 @@ int wire4 = 3;
 const byte ledPin = 13;    //using the built in LED
 
 /*  Application variables:  */
-int maxSec = 60*40; // Time to defuse the bomb
+int maxSec = 60*62; // Time to defuse the bomb
 bool EXPLODED = false;
 bool DEFUSED = false;
 unsigned long period = 10000;  //Amount of milliseconds between the buzzers
@@ -49,7 +49,7 @@ void checkBuzzer(int duration){
   currentMillis = millis();  //get the current "time" (actually the number of milliseconds since the program started)
   if (currentMillis - startMillisForBuzzer >= period)  //check whether the period has elapsed
   {
-    //tone(buzzerPin, 800, duration);  //if so, buzzer to the player
+    tone(buzzerPin, 800, duration);  //if so, buzzer to the player
     startMillisForBuzzer = currentMillis;  //save the current time to the starttime for the buzzer
   }
 }
@@ -74,8 +74,9 @@ String getCountdown(int ellapsedSeconds){
   int secToGo = maxSec - ellapsedSeconds;
   int timerSec = secToGo % 60;
   int timerMin = secToGo / 60;
-  int timerHour = secToGo / (60*60);
+  int timerHour = (secToGo / (60*60));
 
+  timerMin = timerMin - (timerHour*60);
   String sTimerMin = String(timerMin);
   if(timerMin < 10){
     sTimerMin = String("0" + sTimerMin);

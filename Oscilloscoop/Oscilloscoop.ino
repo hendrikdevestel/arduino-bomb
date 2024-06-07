@@ -5,7 +5,9 @@ int yellow4 = 7;
 int powerLed = 10;
 int powerSwitch = 13;
 bool delayed = false;
-int delayTime = 4000;
+int delayTime = 500;
+unsigned long startMillis;  //start of switched off
+unsigned long currentMillis;
 
 void setup() {
   Serial.begin(9600);
@@ -15,6 +17,7 @@ void setup() {
   pinMode(yellow4, OUTPUT);
   pinMode(powerLed, OUTPUT);
   pinMode(powerSwitch, INPUT);
+  
 }
 
 void loop() {
@@ -39,10 +42,20 @@ void turnOn(){
   digitalWrite(yellow4, HIGH);
 }
 void turnOff(){
+  if(startMillis == NULL){
+    startMillis = millis();
+  }
+  currentMillis = millis();  //get the current "time" (actually the number of milliseconds since the program started)
+  if (currentMillis - startMillis >= 500)  //check whether the power is off for at least 0.5 seconds
+  {
+    turnLightsOff();
+  }
+}
+void turnLightsOff(){
   digitalWrite(powerLed, LOW);
   digitalWrite(yellow1, LOW);
   digitalWrite(yellow2, LOW);
   digitalWrite(yellow3, LOW);
   digitalWrite(yellow4, LOW);
-  delayed = false;
+  startMillis = NULL;
 }
