@@ -18,12 +18,13 @@ void setup() {
 }
 
 void loop() {
-    if(digitalRead(powerSwitch) == LOW){
-      turnOff();
-    }
-    else{
-      turnOn();
-    }
+  int switchState = digitalRead(powerSwitch);
+  if(switchState == LOW){
+    turnOff();
+  }
+  else{
+    turnOn();
+  }
 }
 
 void turnOn(){
